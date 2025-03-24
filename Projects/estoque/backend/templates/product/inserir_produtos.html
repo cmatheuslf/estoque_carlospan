@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Criar Novo Produto</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            padding: 20px;
+        }
+        form {
+            max-width: 400px;
+            display: flex;
+            flex-direction: column;
+        }
+        label {
+            margin-top: 10px;
+        }
+        input {
+            padding: 8px;
+            margin-bottom: 10px;
+        }
+        button {
+            padding: 10px;
+            background-color: blue;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: darkblue;
+        }
+        #mensagem {
+            margin-top: 15px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <button>
+            <p>
+                <a href="http://127.0.0.1:5000/">HOME</a>
+            </p>
+        </button>
+        <button>
+            <p>
+                <a href="http://127.0.0.1:5000/produtos/insert_page">Adicionar Produtos</a>
+            </p>
+        </button>
+    </nav>
+
+    <h1>Cadastrar Novo Produto</h1>
+
+    <form id="produto-form">
+        <label for="pnome">Nome do Produto:</label>
+        <input type="text" id="pnome" required>
+
+        <label for="cbarra">Código de Barras:</label>
+        <input type="number" id="cbarra" required>
+
+        <label for="medida">Unidade de Medida:</label>
+        <input type="text" id="medida" required>
+
+        <label for="quantidade">Quantidade:</label>
+        <input type="number" id="quantidade" required>
+
+        <label for="alerta">Estoque Mínimo (Alerta):</label>
+        <input type="number" id="alerta" required>
+
+        <button type="submit">Criar Produto</button>
+    </form>
+
+    <p id="mensagem"></p>
+
+    <script>
+        document.getElementById("produto-form").addEventListener("submit", async function(event) {
+            event.preventDefault(); // Evita recarregar a página
+
+            const produto = {
+                pnome: document.getElementById("pnome").value,
+                cbarra: document.getElementById("cbarra").value,
+                medida: document.getElementById("medida").value,
+                quantidade: document.getElementById("quantidade").value,
+                alerta: document.getElementById("alerta").value
+            };
+
+            try {
+                const resposta = await fetch("http://127.0.0.1:5000/produtos/new", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(produto),
+                    credentials: "include" // Garante que os cookies de sessão sejam enviados
+                });
+
+                const resultado = await resposta.json();
+
+                if (resposta.ok) {
+                    document.getElementById("mensagem").textContent = "✅ Produto cadastrado com sucesso!";
+                    document.getElementById("mensagem").style.color = "green";
+                    document.getElementById("produto-form").reset(); // Limpa o formulário
+                } else {
+                    document.getElementById("mensagem").textContent = `❌ Erro: ${resultado.error || resultado}`;
+                    document.getElementById("mensagem").style.color = "red";
+                }
+            } catch (erro) {
+                document.getElementById("mensagem").textContent = "❌ Falha na conexão com o servidor!";
+                document.getElementById("mensagem").style.color = "red";
+            }
+        });
+    </script>
+
+</body>
+</html>

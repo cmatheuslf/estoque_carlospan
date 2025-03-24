@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lista de Produtos</title>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: center;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        .alerta {
+            color: red;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <button>
+            <p>
+                <a href="http://127.0.0.1:5000/">HOME</a>
+            </p>
+        </button>
+        <button>
+            <p>
+                <a href="http://127.0.0.1:5000/produtos/insert_page">Adicionar Produtos</a>
+            </p>
+        </button>
+    </nav>
+    <h1>Lista de Produtos</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>Nome</th>
+                <th>Código de Barras</th>
+                <th>Medida</th>
+                <th>Quantidade</th>
+                <th>Alerta</th>
+                <th>Editar</th>
+            </tr>
+        </thead>
+        <tbody id="produto-tabela">
+            <!-- Os produtos serão inseridos aqui -->
+        </tbody>
+    </table>
+
+    <script>
+      // Função para buscar produtos do endpoint Flask
+   // Função para buscar produtos do endpoint Flask
+function fetchProdutos() {
+    fetch("http://127.0.0.1:5000/produtos/list_products") // Altere para o endpoint correto
+        .then(response => {
+            if (!response.ok) {
+                throw new Error("Erro ao buscar produtos");
+            }
+            return response.json();
+        })
+        .then(data => {
+            produtos = data; // Atualiza a variável global produtos
+            renderizarProdutos(); // Atualiza a tabela com os novos produtos
+        })
+        .catch(error => {
+            console.error("Erro:", error);
+        });
+}
+
+// Função para redirecionar para a página de edição enviando um JSON
+function editarProduto(produto) {
+    // Salva o produto no sessionStorage para recuperar na outra página
+    sessionStorage.setItem("produtoSelecionado", JSON.stringify(produto));
+
+    // Redireciona para a página de edição
+    window.location.href = "http://127.0.0.1:5000/produtos/edit";
+}
+
+// Função para renderizar os produtos na tabela
+function renderizarProdutos() {
+    const tabela = document.getElementById("produto-tabela");
+    tabela.innerHTML = ""; // Limpa a tabela antes de renderizar
+
+    produtos.forEach((produto) => {
+        let row = `
+            <tr>
+                <td>${produto.pnome}</td>
+                <td>${produto.cbarra}</td>
+                <td>${produto.medida}</td>
+                <td>${produto.quantidade}</td>
+                <td class="${produto.quantidade < produto.alerta ? 'alerta' : ''}">
+                    ${produto.quantidade < produto.alerta ? '⚠ Estoque Baixo!' : '✔ Ok'}
+                </td>
+                <td>
+                    <button onclick='editarProduto(${JSON.stringify(produto)})'>Editar</button>
+                </td>
+            </tr>
+        `;
+        tabela.innerHTML += row;
+    });
+}
+
+// Chama fetchProdutos ao carregar a página
+document.addEventListener("DOMContentLoaded", fetchProdutos);
+
+    </script>
+
+</body>
+</html>

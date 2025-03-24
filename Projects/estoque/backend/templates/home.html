@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Minha Home</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <h1>Bem-vindo à minha página Home!</h1>
+    <p>Este é um exemplo de página renderizada com Flask.</p>
+    <button>
+        <p>
+            <a href="http://127.0.0.1:5000/login">Login
+        </p>
+    </button>
+    <br>
+    <br>
+    <br>
+    <button>
+        <p>
+            <a href="http://127.0.0.1:5000/produtos/">Listar Produtos</a>
+        </p>
+    </button><br>
+    <br>
+    <br>
+    <button>
+        <p>
+            <a href="http://127.0.0.1:5000/produtos/insert_page">Adicionar Produtos</a>
+        </p>
+    </button>
+</body>
+</html>

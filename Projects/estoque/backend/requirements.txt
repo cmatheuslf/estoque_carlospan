@@ -1,0 +1,5 @@
+Flask
+flask-login
+Flask-CORS
+psycopg2
+python-dotenv

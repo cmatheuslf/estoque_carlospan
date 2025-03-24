@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editar Produto</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            padding: 20px;
+        }
+        form {
+            max-width: 400px;
+            display: flex;
+            flex-direction: column;
+        }
+        label {
+            margin-top: 10px;
+        }
+        input {
+            padding: 8px;
+            margin-bottom: 10px;
+        }
+        button {
+            padding: 10px;
+            background-color: blue;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: darkblue;
+        }
+        #mensagem {
+            margin-top: 15px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <button><a href="http://127.0.0.1:5000/">HOME</a></button>
+        <button><a href="http://127.0.0.1:5000/produtos/insert_page">Adicionar Produtos</a></button>
+    </nav>
+
+    <h1>Editar Produto</h1>
+
+    <form id="produto-form">
+        <label for="cbarra">Código de Barras:</label>
+        <input type="number" id="cbarra" required readonly> <!-- Desativado para edição -->
+
+        <label for="pnome">Nome do Produto:</label>
+        <input type="text" id="pnome" required>
+
+        <label for="medida">Unidade de Medida:</label>
+        <input type="text" id="medida" required>
+
+        <label for="quantidade">Quantidade:</label>
+        <input type="number" id="quantidade" required>
+
+        <label for="alerta">Estoque Mínimo (Alerta):</label>
+        <input type="number" id="alerta" required>
+
+        <button type="submit">Salvar Alterações</button>
+    </form>
+
+    <p id="mensagem"></p>
+
+    <script>
+        console.log("JavaScript carregado corretamente!");
+
+        // Função para carregar os dados do produto da página anterior
+        function carregarProduto() {
+            const produtoJSON = sessionStorage.getItem("produtoSelecionado");
+
+            if (!produtoJSON) {
+                document.getElementById("mensagem").textContent = "❌ Nenhum produto encontrado.";
+                document.getElementById("mensagem").style.color = "red";
+                return;
+            }
+
+            const produto = JSON.parse(produtoJSON);
+
+            // Preenche os campos com os valores recebidos
+            document.getElementById("cbarra").value = produto.cbarra;
+            document.getElementById("pnome").value = produto.pnome;
+            document.getElementById("medida").value = produto.medida;
+            document.getElementById("quantidade").value = produto.quantidade;
+            document.getElementById("alerta").value = produto.alerta;
+
+            document.getElementById("mensagem").textContent = "✅ Produto carregado!";
+            document.getElementById("mensagem").style.color = "green";
+        }
+
+        // Carrega o produto ao iniciar a página
+        document.addEventListener("DOMContentLoaded", carregarProduto);
+
+        // Função para atualizar o produto
+        document.getElementById("produto-form").addEventListener("submit", async function(event) {
+            event.preventDefault();
+
+            const produtoAtualizado = {
+                cbarra: document.getElementById("cbarra").value,  // Agora enviamos o código de barras também
+                pnome: document.getElementById("pnome").value,
+                medida: document.getElementById("medida").value,
+                quantidade: document.getElementById("quantidade").value,
+                alerta: document.getElementById("alerta").value
+            };
+
+            console.log("Enviando dados:", produtoAtualizado); // Debug
+
+            try {
+                const resposta = await fetch("http://127.0.0.1:5000/produtos/update", { 
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(produtoAtualizado)
+                });
+
+                const resultado = await resposta.json();
+                console.log("Resposta da API:", resultado);
+
+                if (resposta.ok) {
+                    document.getElementById("mensagem").textContent = "✅ Produto atualizado com sucesso!";
+                    document.getElementById("mensagem").style.color = "green";
+                    window.location.href = "http://127.0.0.1:5000/produtos/";
+                } else {
+                    document.getElementById("mensagem").textContent = `❌ Erro: ${resultado.error || resultado}`;
+                    document.getElementById("mensagem").style.color = "red";
+                }
+            } catch (erro) {
+                console.error("Erro ao conectar ao servidor:", erro);
+                document.getElementById("mensagem").textContent = "❌ Falha ao conectar ao servidor!";
+                document.getElementById("mensagem").style.color = "red";
+            }
+        });
+    </script>
+
+</body>
+</html>
